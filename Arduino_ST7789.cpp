@@ -10,6 +10,7 @@
 #include "wiring_private.h"
 #include <SPI.h>
 
+
 static const uint8_t PROGMEM
   cmd_240x240[] = {                 		// Initialization commands for 7789 screens
     10,                       				// 9 commands in list:
@@ -245,29 +246,26 @@ void Arduino_ST7789::setRotation(uint8_t m) {
   rotation = m % 4; // can't be higher than 3
   switch (rotation) {
    case 0:
-     writedata(ST7789_MADCTL_MX | ST7789_MADCTL_MY | ST7789_MADCTL_RGB);
-
+     writedata(ST7789_MADCTL_RGB);
      _xstart = _colstart;
      _ystart = _rowstart;
      break;
    case 1:
-     writedata(ST7789_MADCTL_MY | ST7789_MADCTL_MV | ST7789_MADCTL_RGB);
-
+     writedata(ST7789_MADCTL_MX | ST7789_MADCTL_MV | ST7789_MADCTL_RGB);
      _ystart = _colstart;
      _xstart = _rowstart;
      break;
   case 2:
-     writedata(ST7789_MADCTL_RGB);
- 
-     _xstart = _colstart;
-     _ystart = _rowstart;
+     writedata(ST7789_MADCTL_MX | ST7789_MADCTL_MY | ST7789_MADCTL_RGB);
+	 _ystart = _colstart+80;
+     _xstart = _rowstart;
      break;
 
    case 3:
-     writedata(ST7789_MADCTL_MX | ST7789_MADCTL_MV | ST7789_MADCTL_RGB);
+     writedata(ST7789_MADCTL_MV | ST7789_MADCTL_MY | ST7789_MADCTL_RGB);
 
      _ystart = _colstart;
-     _xstart = _rowstart;
+     _xstart = _rowstart+80;
      break;
   }
 }
@@ -277,7 +275,7 @@ void Arduino_ST7789::setAddrWindow(uint8_t x0, uint8_t y0, uint8_t x1,
 
   uint16_t x_start = x0 + _xstart, x_end = x1 + _xstart;
   uint16_t y_start = y0 + _ystart, y_end = y1 + _ystart;
-  
+ 
 
   writecommand(ST7789_CASET); // Column addr set
   writedata(x_start >> 8);
@@ -452,10 +450,9 @@ void Arduino_ST7789::init(uint16_t width, uint16_t height) {
 
   _colstart = ST7789_240x240_XSTART;
   _rowstart = ST7789_240x240_YSTART;
-  _height = 240;
-  _width = 240;
-
+  _height = height;
+  _width = width;
   displayInit(cmd_240x240);
-
-  setRotation(2);
+   
+  //setRotation(2);
 }
